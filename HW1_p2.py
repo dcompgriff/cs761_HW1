@@ -14,7 +14,7 @@ def main():
     partb(10)
     #partc1()
     #partc2()
-    #partc1Test()
+    partc1Test()
     #partc2Test()
 
 

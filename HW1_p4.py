@@ -16,12 +16,12 @@ def main():
 
     #Calculate variation in exact probability, and independence assumed probability
     #  for random subsets of the data to determine magnitude of variation.
-    #calculateVariability(data)
-
+    calculateVariability(data)
 
     #Calculate variation of probabilities for data.
-    print("Pr(A=1,B=1,C=1): " + str(getEmpericalProbabilityDifference(data, 1, 1, 1)[0]))
-    print("Pr(A=1,B=1,C=1): " + str(getEmpericalProbabilityDifference(data, 1, 1, 1)[1]))
+    print("Total summed difference in probability: " + str(getEmpiricalTotalConditionalProbabilityDifference(data)))
+    print("Uniformly distributed error per calculation: " + str(getEmpiricalTotalConditionalProbabilityDifference(data)/8))
+
 
 '''
 Calculate variability of inter-probability calculations.
@@ -68,7 +68,8 @@ def getEmpiricalTotalConditionalProbabilityDifference(data):
     for A in [0, 1]:
         for B in [0, 1]:
             for C in [0, 1]:
-                totalDifference += getEmpericalProbabilityDifference(data, A, B, C)
+                exactProb, assumedIndepProb = getEmpericalProbabilityDifference(data, A, B, C)
+                totalDifference += abs(exactProb - assumedIndepProb)
     return totalDifference
 
 
