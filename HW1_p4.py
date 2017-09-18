@@ -1,4 +1,5 @@
 import scipy.io
+import numpy as np
 
 
 def main():
@@ -13,9 +14,49 @@ def main():
     for row in mat['xC']:
         data['C'].append(row[0])
 
+    #Calculate variation in exact probability, and independence assumed probability
+    #  for random subsets of the data to determine magnitude of variation.
+    #calculateVariability(data)
+
+
     #Calculate variation of probabilities for data.
     print("Pr(A=1,B=1,C=1): " + str(getEmpericalProbabilityDifference(data, 1, 1, 1)[0]))
     print("Pr(A=1,B=1,C=1): " + str(getEmpericalProbabilityDifference(data, 1, 1, 1)[1]))
+
+'''
+Calculate variability of inter-probability calculations.
+'''
+def calculateVariability(data):
+    for A in [0, 1]:
+        for B in [0, 1]:
+            for C in [0, 1]:
+                # Calculate variation in exact probability, and independence assumed probability
+                #  for random subsets of the data to determine magnitude of variation.
+                exactProbVariationMean = 0
+                assumedIndepVariationMean = 0
+                randIndexList = list(range(0, len(data['A'])))
+                for k in range(0, 30):
+                    # Shuffle data indecies.
+                    np.random.shuffle(randIndexList)
+                    firstHalf = {'A': [], 'B': [], 'C': []}
+                    secondHalf = {'A': [], 'B': [], 'C': []}
+                    for index in range(0, len(randIndexList) / 2):
+                        firstHalf['A'].append(data['A'][randIndexList[index]])
+                        firstHalf['B'].append(data['B'][randIndexList[index]])
+                        firstHalf['C'].append(data['C'][randIndexList[index]])
+                    for index in range(len(randIndexList) / 2, len(randIndexList)):
+                        secondHalf['A'].append(data['A'][randIndexList[index]])
+                        secondHalf['B'].append(data['B'][randIndexList[index]])
+                        secondHalf['C'].append(data['C'][randIndexList[index]])
+                    firstHalfExact, firstHalfAssumed = getEmpericalProbabilityDifference(firstHalf, A, B, C)
+                    secondHalfExact, secondHalfAssumed = getEmpericalProbabilityDifference(secondHalf, A, B, C)
+
+                    exactProbVariationMean += abs(firstHalfExact - secondHalfExact)
+                    assumedIndepVariationMean += abs(firstHalfAssumed - secondHalfAssumed)
+
+                print("Average exact probability variation (%d,%d,%d): "%(A,B,C) + str(exactProbVariationMean / 30.0))
+                print("Average assumed independence probability variation (%d,%d,%d): "%(A,B,C) + str(assumedIndepVariationMean / 30.0))
+
 
 '''
 This method sums up the difference in the actual conditional probability
